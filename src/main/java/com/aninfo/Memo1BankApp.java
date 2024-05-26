@@ -2,6 +2,9 @@ package com.aninfo;
 
 import com.aninfo.model.Account;
 import com.aninfo.service.AccountService;
+import com.aninfo.model.Transaction;
+import com.aninfo.model.TransactionType;
+import com.aninfo.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +29,8 @@ public class Memo1BankApp {
 
 	@Autowired
 	private AccountService accountService;
+
+	
 
 	public static void main(String[] args) {
 		SpringApplication.run(Memo1BankApp.class, args);
@@ -73,6 +78,37 @@ public class Memo1BankApp {
 	@PutMapping("/accounts/{cbu}/deposit")
 	public Account deposit(@PathVariable Long cbu, @RequestParam Double sum) {
 		return accountService.deposit(cbu, sum);
+	}
+
+	// - - endpoints of transaction - -
+
+	@Autowired
+	private TransactionService transactionService;
+
+	// creation of transaction
+	@PostMapping("/transactions")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Transaction createTransaction(@RequestParam Long from_account, @RequestParam Long to_account, @RequestParam TransactionType type, @RequestParam Double amount) {
+		return transactionService.createTransaction(from_account, to_account, amount, type);
+	}
+
+	// get a single transaction
+	@GetMapping("/transactions/{id}")
+	public ResponseEntity<Transaction> getTransaction(@PathVariable Long id) {
+		Optional<Transaction> transactionOptional = transactionService.findById(id);
+		return ResponseEntity.of(transactionOptional);
+	}
+
+   	// obtain all transactions of an account
+	@GetMapping("/accounts/{cbu}/transactions")
+	public Collection<Transaction> getTransactionsByAccount(@PathVariable Long cbu) {
+		return transactionService.getTransactionsByAccount(cbu);
+	}
+
+    // delete transaction and rollback
+	@DeleteMapping("/transactions/{id}")
+	public void deleteTransaction(@PathVariable Long id) {
+		transactionService.deleteById(id);
 	}
 
 	@Bean

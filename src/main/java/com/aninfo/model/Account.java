@@ -3,10 +3,11 @@ package com.aninfo.model;
 import javax.persistence.*;
 
 @Entity
+@SequenceGenerator(name="account_seq", sequenceName="account_seq", allocationSize=1)
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
     private Long cbu;
 
     private Double balance;
